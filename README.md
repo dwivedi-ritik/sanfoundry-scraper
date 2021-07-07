@@ -62,7 +62,7 @@ python main.py --url {url-of-quiz} --thread --pdf
 Get json file of all yours quizs
 
 ```bash
-python main.py --url {url-of-quiz} --thread --json
+python main.py --url {url-of-quiz} --json
 ```
 
 ### Basic Guide
