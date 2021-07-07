@@ -73,9 +73,9 @@ def mcqscrape_json(url):
                 question = prevs[2].text
             try:
                 if prevs[1].name == "pre":
-                    pre_code = prevs[1]
+                    pre_code = prevs[1].text
                 if prevs[1]['class'][0] == "hk1_style-wrap5":
-                    code = prevs[1]
+                    code = prevs[1].text
             except KeyError as e:
                 pass
             options = prevs[0].text.split("\n")

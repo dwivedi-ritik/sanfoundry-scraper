@@ -1,9 +1,10 @@
 import sys
 import time
+import os
 from argparse import ArgumentParser
 from typing import List ,Optional
 from concurrent.futures import ThreadPoolExecutor
-
+from weasyprint import HTML , CSS
 from pagescrape import pagescrape
 from mcqscrape import mcqscrape_html, write_to_html  , mcqscrape_json
 from bs4 import BeautifulSoup
@@ -14,13 +15,14 @@ parser = ArgumentParser(description="A CLI Tool for scrapping quizs from SANFOUN
 parser.add_argument("--url" , help="URL of quiz" , type=str , default=None , dest="url")
 parser.add_argument("--pdf" , help="Generate PDF File" , default=False , dest="pdf" ,action="store_true")
 parser.add_argument("--thread" , action="store_true" , help="Uses Multithreading for scrapping")
-parser.add_argument("--json" , action="return all quizs in json format" , action="store-true" , default=False , dest="json")
+parser.add_argument("--json" , help="return all quizs in json format" , action ="store_true" , default=False , dest="json")
 parser.add_argument("--workers" , type=int , help="Maximum number of threads[ More number More speed but More Unstability]" , default=5)
 args = parser.parse_args()
 
 QUIZ_LIST: List[str] = []
 
 def main(PAGE_URL: str ):
+    MEGA_HTML = ''
     if PAGE_URL == '':
         print("Please Enter a URL!")
         sys.exit(0)
@@ -55,21 +57,22 @@ def write_pdf(file_name: str) -> None:
         HTML(filename=f"./Saved_MCQs/{file_name}.html").write_pdf(f"./Saved_PDFs/{file_name}.pdf", stylesheets=[CSS(string='body { font-size: 13px }')])
 
 def retrive_json(link):
-    links = pagescrape(link)
+    pages = pagescrape(link)
     for k, v in pages.items():
         pprint(mcqscrape_json(v))
 
 
 if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
-    PAGE_URL = args.url or input(command)
-
+    # PAGE_URL = args.url or input(command)
+    PAGE_URL = "c-interview-questions-answers"
     if args.thread:
         async_main(PAGE_URL)
     if args.pdf:
-        write_pdf(PAGE_URL.split('/')[-2])
+        # write_pdf(PAGE_URL.split('/')[-2])
+        write_pdf(PAGE_URL)
     if args.json:
-        retrive_json()
+        retrive_json(PAGE_URL)
     else:
         main(PAGE_URL)
 
@@ -77,4 +80,3 @@ if __name__ == "__main__":
 I did a test run with 10 workers on this link https://www.sanfoundry.com/1000-python-questions-answers/
 Normal Function takes around 50 seconds , multithreading takes 17 seconds
 """
-        
