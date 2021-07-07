@@ -1,7 +1,3 @@
-
-
-
-
 # from pprint import pprint
 # import requests
 # from bs4 import BeautifulSoup

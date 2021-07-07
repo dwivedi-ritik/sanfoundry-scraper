@@ -59,7 +59,7 @@ You can make pdf of scrapped quiz
 python main.py --url {url-of-quiz} --thread --pdf
 ```
 
-Get json response
+Get json file of all yours quizs
 
 ```bash
 python main.py --url {url-of-quiz} --thread --json

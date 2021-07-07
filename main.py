@@ -1,6 +1,8 @@
 import sys
 import time
 import os
+import json
+
 from argparse import ArgumentParser
 from typing import List ,Optional
 from concurrent.futures import ThreadPoolExecutor
@@ -56,25 +58,33 @@ def write_pdf(file_name: str) -> None:
     if inp.lower() != "no":
         HTML(filename=f"./Saved_MCQs/{file_name}.html").write_pdf(f"./Saved_PDFs/{file_name}.pdf", stylesheets=[CSS(string='body { font-size: 13px }')])
 
-def retrive_json(link):
+def retrive_json(link: str , file_name: str):
     pages = pagescrape(link)
+    dump_json = {
+        file_name:{
+
+        }
+    }
     for k, v in pages.items():
-        pprint(mcqscrape_json(v))
+        print(f"{k}  has added.")
+        dump_json[file_name][k] = mcqscrape_json(v)
+    with open(file_name+".json", "w") as j:
+        j.write(json.dumps(dump_json , indent=4))
 
 
 if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
     PAGE_URL = args.url or input(command)
-
+    file_name = PAGE_URL.split('/')[-2]
     if args.thread:
         async_main(PAGE_URL)
     
     if args.pdf:
-        write_pdf(PAGE_URL.split('/')[-2])
+        write_pdf(file_name)
     if args.json:
-        retrive_json(PAGE_URL)
+        retrive_json(PAGE_URL , file_name)
 
-    if not(args.thead and args.json):
+    if not(args.thread or args.json):
         main(PAGE_URL)    
 
 """
