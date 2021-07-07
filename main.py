@@ -64,13 +64,11 @@ def retrive_json(link):
 
 if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
-    # PAGE_URL = args.url or input(command)
-    PAGE_URL = "c-interview-questions-answers"
+    PAGE_URL = args.url or input(command)
     if args.thread:
         async_main(PAGE_URL)
     if args.pdf:
-        # write_pdf(PAGE_URL.split('/')[-2])
-        write_pdf(PAGE_URL)
+        write_pdf(PAGE_URL.split('/')[-2])
     if args.json:
         retrive_json(PAGE_URL)
     else:
