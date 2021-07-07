@@ -1,23 +1,14 @@
-import bs4
-from pagescrape import pagescrape
 import os
 import requests
+from typing import List , Optional
+import bs4
 from bs4 import BeautifulSoup
-
+from pagescrape import pagescrape
+from weasyprint import HTML , CSS
 
 def write_to_html(data: BeautifulSoup, filename):
     if not os.path.exists("Saved_MCQs"):
         os.mkdir("Saved_MCQs")
-    # add mathjax
-    #  <script>
-    #   MathJax = {
-    #     tex: {
-    #       inlineMath: [['$', '$'], ['\\(', '\\)']]
-    #     }
-    #   };
-    # </script>
-    # <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
-    # </script>
     head = BeautifulSoup("""
     <head>
     <script>
@@ -31,47 +22,74 @@ def write_to_html(data: BeautifulSoup, filename):
     </script>
     </head>""", "lxml")
     data.body.insert_before(head)
-    # print(data)
+    
     with open(f"./Saved_MCQs/{filename}.html", "w+", encoding="utf-8") as file:
         file.write(str(data.prettify()))
 
+#Testing Op
+def write_to_formated_html(pages: List[str] , file_name: str , write_pdf: Optional[bool] = False):
+    LORD_MD: str = ""
+    for module , link in pages.items():
+        temp = f"<h4><i>{module}<i></h4>\n"
+        for count , quiz in enumerate(mcqscrape_json(link)):
+            temp +=  f"<p>{count + 1}. {quiz['question']}</p>\n"
+            temp += "<ol type='a'>\n"
+            for q in quiz["options"]:
+                temp += f"<li>{q}</li>\n"
+            temp += "</ol>"
+            temp += f"<p><b>Answer:</b> {quiz['answer']}</p>\n"
+            temp += f"<p>{quiz['explanation']}</p>\n"
+        LORD_MD += temp
+    
+    with open(f"./Saved_MCQs/{file_name}.html" , "w") as f:
+        f.write(LORD_MD)
+    inp = input("WeasyPrint is known to be slow and Converting html to pdf is resource taking and freezing can occur due to high ram use if pages are above 50 please close other apps. Are you sure ? (yes/no)")
+    if write_pdf:
+        if not os.path.exists("Saved_PDFs"):
+            os.mkdir("Saved_PDFs")
+        if inp.lower() != "no":
+            HTML(filename=f"./Saved_MCQs/{file_name}.html").write_pdf(f"./Saved_PDFs/{file_name}.pdf", stylesheets=[CSS(string='body { font-size: 13px }')])
 
-def mcqscrape_json(url: str):
-    # print(title)
-    mcqs = []
-    res = requests.get(url)
-    soup = BeautifulSoup(res.content, 'lxml')
-    content = soup.find('div', 'entry-content')
-    paras = content.findAll('p')
-    header = paras[0].text
-    print(header)
-    each = ''
-    try:
-        for each in paras[1:-3]:
-            answerid = each.span['id']
-            answer_div = content.find('div', id='target-'+answerid)
-            # decompose span
-            each.span.decompose()
-            # print(repr(each.text))
-            question = each.text.split("\n")[0].split(".", 1)[-1].strip()
-            options = [option.split(')', 1)[-1].strip()
-                       for option in each.text.split('\n')[1:] if option != '']
-            # print(repr(answer_div.text))
-            answer = answer_div.text.split('\n', 1)[0].strip('Answer: ')
-            explanation = answer_div.text.split('\n', 1)[1].strip()
-            # print(answer)
-            question_dict = {
-                "question": question,
-                "options": options,
-                "answer": answer,
-                "explanation": explanation
-            }
-            mcqs.append(question_dict)
-    except Exception as err:
-        print("current iteration has ", each)
-        print("Error: ", err)
-    return mcqs
-
+def mcqscrape_json(url):
+    content = requests.get(url).content
+    soup = BeautifulSoup(content , "lxml")
+    q_content = soup.find("div" , "entry-content")
+    coll = q_content.find_all("div" , "collapseomatic_content")
+    mcq_json = []
+    for c in coll:
+        question , code , pre_code , answer ,  explain , options, = None , None , None , None , None , None
+        prevs = c.find_previous_siblings()
+        res = prevs[0].text
+        if res[0].isdigit():
+            if prevs[0].span:
+                    prevs[0].span.decompose()
+                    temp_qna = res.split("\n")
+                    question , *options = temp_qna
+        else:
+            try:
+                if prevs[2]['class'][0] == "sf-mobile-ads":
+                    question = prevs[3].text
+            except KeyError as e:
+                question = prevs[2].text
+            try:
+                if prevs[1].name == "pre":
+                    pre_code = prevs[1]
+                if prevs[1]['class'][0] == "hk1_style-wrap5":
+                    code = prevs[1]
+            except KeyError as e:
+                pass
+            options = prevs[0].text.split("\n")
+        answer , *temp_explain = c.text.split("\n")
+        explain = "".join(temp_explain)
+        mcq_json.append({
+            "question":question,
+            "pre_code":pre_code,
+            "code":code,
+            "options":options,
+            "answer":answer,
+            "explaination":explain
+        })
+    return mcq_json
 
 def mcqscrape_html(url: str) -> str:
     if '1000' in url:
