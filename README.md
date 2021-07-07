@@ -1,11 +1,19 @@
 # sanfoundry-scraper
 
+This repo is the fork of [this repo](https://github.com/raprocks/sanfoundry-scraper) with some little extra weirdo features 🤠.
+
+- Scrape HTML
+- You can make pdf of all quizs
+- Support faster scrapping with multithreading
+- Support json response
+
 Extracts all MCQs of a subject that you input the link of.
 
-run the main.py file after getting the code using the Download zip button or following this [link](https://github.com/dwivedi-ritik/sanfoundry-scraper).
+run the `python main.py` file after getting the code using the Download zip button or following this [link](https://github.com/dwivedi-ritik/sanfoundry-scraper).
 
-`usage:
-python main.py --thread --workers 15
+```terminal
+usage:
+python main.py
 
 A CLI Tool for scrapping quizs from SANFOUNDARY
 
@@ -18,7 +26,8 @@ optional arguments:
 --workers WORKERS Maximum number of threads[ More number More speed but More
 Unstability]
 
-Batmobile lost the wheel lol`
+Batmobile lost the wheel lol
+```
 
 just run main.py using the following command
 
@@ -35,14 +44,28 @@ python main.py --url {url-of-quiz}
 this scrapper also uses multithreading
 
 ```bash
-python main.py --url {url-of-quiz} --thread --workers 15
+python main.py --url {url-of-quiz} --thread
 ```
 
 Here workers are the number of threads. Default workers are 5 .
 
-You can change by passing `--workers {thread-choice}` .
+You can change by passing `--workers {thread-choice}` eg `--workers 10`.
 
-More workers can cause unstability
+note - More workers can cause unstability
+
+You can make pdf of scrapped quiz
+
+```bash
+python main.py --url {url-of-quiz} --thread --pdf
+```
+
+Get json response
+
+```bash
+python main.py --url {url-of-quiz} --thread --json
+```
+
+### Basic Guide
 
 Input the URL of the Subject (for example, "https://www.sanfoundry.com/1000-object-oriented-programming-oops-questions-answers/") and run it to get a file in a folder named
 `Saved_MCQs` of all the MCQs of the subject.
@@ -53,13 +76,9 @@ run the following command if you are using the program for the first time.
 pip install -r requirements.txt
 ```
 
-and
+to install requirements.
 
-```bash
-python main.py --help
-```
-
-to install requirements
+after that just run `python main.py` with required flags.
 
 LOG: This is getting traction hehe so gonna make it better to use and better at output
 
