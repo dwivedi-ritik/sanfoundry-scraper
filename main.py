@@ -76,16 +76,23 @@ if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
     PAGE_URL = args.url or input(command)
     file_name = PAGE_URL.split('/')[-2]
+    flag = 0
+    if not args.thread:
+        main(PAGE_URL)
+    if not args.json:
+        main(PAGE_URL)
+
+        
     if args.thread:
         async_main(PAGE_URL)
-    
+
     if args.pdf:
         write_pdf(file_name)
+    
     if args.json:
         retrive_json(PAGE_URL , file_name)
+    
 
-    if not(args.thread or args.json):
-        main(PAGE_URL)    
 
 """
 I did a test run with 10 workers on this link https://www.sanfoundry.com/1000-python-questions-answers/
