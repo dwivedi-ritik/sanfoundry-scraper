@@ -2,7 +2,23 @@
 
 Extracts all MCQs of a subject that you input the link of.
 
-run the main.py file after getting the code using the Download zip button or following this [link](https://github.com/raprocks/sanfoundry-scraper/archive/master.zip).
+run the main.py file after getting the code using the Download zip button or following this [link](https://github.com/dwivedi-ritik/sanfoundry-scraper).
+
+`usage:
+python main.py --thread --workers 15
+
+A CLI Tool for scrapping quizs from SANFOUNDARY
+
+optional arguments:
+-h, --help show this help message and exit
+--url URL URL of quiz
+--pdf Generate PDF File
+--thread Uses Multithreading for scrapping
+--json return all quizs in json format
+--workers WORKERS Maximum number of threads[ More number More speed but More
+Unstability]
+
+Batmobile lost the wheel lol`
 
 just run main.py using the following command
 
