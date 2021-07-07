@@ -15,7 +15,9 @@ def pagescrape(url: str) -> Dict[str, str]:
     tables = [item.table for item in filtered_sf_content]
     links = {}
     for table in tables:
-        hrefs = {link.text.strip().replace(
-            " ", '-'): link["href"] for link in table.findAll('a')}
-        links.update(hrefs)
+        try:
+            hrefs = {link.text.strip().replace(" ", '-'): link["href"] for link in table.findAll('a')}
+            links.update(hrefs)
+        except Exception:
+            pass
     return links

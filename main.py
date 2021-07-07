@@ -50,7 +50,7 @@ def async_main(url: str) -> None:
                   PAGE_URL.split('/')[-2])
 
 def write_pdf(file_name: str) -> None:
-    inp: str = input("WeasyPrint is known to be slow and Converting html to pdf is resource taking and freezing can occur due to high ram use if pages are above 50 please close other apps. Are you sure ? (yes/no)")
+    inp: str = input("\nWeasyPrint is known to be slow and Converting html to pdf is resource taking.High ram is normal in this process.\nif pages are above 50 please close other apps. Are you sure ? (yes/no) ")
     if not os.path.exists("Saved_PDFs"):
         os.mkdir("Saved_PDFs")
     if inp.lower() != "no":
@@ -65,14 +65,17 @@ def retrive_json(link):
 if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
     PAGE_URL = args.url or input(command)
+
     if args.thread:
         async_main(PAGE_URL)
+    
     if args.pdf:
         write_pdf(PAGE_URL.split('/')[-2])
     if args.json:
         retrive_json(PAGE_URL)
-    else:
-        main(PAGE_URL)
+
+    if not(args.thead and args.json):
+        main(PAGE_URL)    
 
 """
 I did a test run with 10 workers on this link https://www.sanfoundry.com/1000-python-questions-answers/
