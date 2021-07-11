@@ -76,15 +76,13 @@ if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
     PAGE_URL = args.url or input(command)
     file_name = PAGE_URL.split('/')[-2]
-    flag = 0
-    if not args.thread:
-        main(PAGE_URL)
-    if not args.json:
-        main(PAGE_URL)
+    #i want make a condition that if some of these condtion are not true 
+    # them i will just execute main.py
 
-        
     if args.thread:
         async_main(PAGE_URL)
+    else:
+        main(PAGE_URL)
 
     if args.pdf:
         write_pdf(file_name)
