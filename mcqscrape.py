@@ -1,6 +1,6 @@
 import os
 import requests
-from typing import List , Optional
+from typing import List , Optional , Dict
 import bs4
 from bs4 import BeautifulSoup
 from pagescrape import pagescrape
@@ -26,7 +26,9 @@ def write_to_html(data: BeautifulSoup, filename):
     with open(f"./Saved_MCQs/{filename}.html", "w+", encoding="utf-8") as file:
         file.write(str(data.prettify()))
 
-#Testing Op
+#I used this function for markdownn and make pdf by that markdown
+#But somehow its takes huge amount time
+
 def write_to_formated_html(pages: List[str] , file_name: str , write_pdf: Optional[bool] = False):
     LORD_MD: str = ""
     for module , link in pages.items():
@@ -50,12 +52,12 @@ def write_to_formated_html(pages: List[str] , file_name: str , write_pdf: Option
         if inp.lower() != "no":
             HTML(filename=f"./Saved_MCQs/{file_name}.html").write_pdf(f"./Saved_PDFs/{file_name}.pdf", stylesheets=[CSS(string='body { font-size: 13px }')])
 
-def mcqscrape_json(url):
-    content = requests.get(url).content
+def mcqscrape_json(url) -> Dict[str , str]:
+    content: str = requests.get(url).content
     soup = BeautifulSoup(content , "lxml")
     q_content = soup.find("div" , "entry-content")
     coll = q_content.find_all("div" , "collapseomatic_content")
-    mcq_json = []
+    mcq_json: List = []
     for c in coll:
         question , code , pre_code , answer ,  explain , options, = None , None , None , None , None , None
         prevs = c.find_previous_siblings()

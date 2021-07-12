@@ -29,10 +29,14 @@ def main(PAGE_URL: str ):
         print("Please Enter a URL!")
         sys.exit(0)
     pages = pagescrape(PAGE_URL)
-    for k, v in pages.items():
-        print("getting", k, "from ->", v, end=' ... ')
-        MEGA_HTML += mcqscrape_html(v)
-        print("Done!")
+    
+    if len(pages) == 0:
+        MEGA_HTML += mcqscrape_html(PAGE_URL)
+    else:
+        for k, v in pages.items():
+            print("getting", k, "from ->", v, end=' ... ')
+            MEGA_HTML += mcqscrape_html(v)
+            print("Done!")
     write_to_html(BeautifulSoup(MEGA_HTML, 'lxml'),
                   PAGE_URL.split('/')[-2])
 
@@ -65,9 +69,14 @@ def retrive_json(link: str , file_name: str):
 
         }
     }
-    for k, v in pages.items():
-        print(f"{k}  has added.")
-        dump_json[file_name][k] = mcqscrape_json(v)
+    print(len(pages))
+    if len(pages) == 0:
+        dump_json[file_name]["Quizs"] = mcqscrape_json(link)
+    else:
+        for k, v in pages.items():
+            print(f"{k}  has added.")
+            dump_json[file_name][k] = mcqscrape_json(v)
+    
     with open(file_name+".json", "w") as j:
         j.write(json.dumps(dump_json , indent=4))
 
