@@ -85,19 +85,21 @@ if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
     PAGE_URL = args.url or input(command)
     file_name = PAGE_URL.split('/')[-2]
-    #i want make a condition that if some of these condtion are not true 
-    # them i will just execute main.py
+    
+    #Well this is how supposed to solve weird if-else problem lol
 
-    if args.thread:
-        async_main(PAGE_URL)
-    else:
+    condition_arr = [args.thread , args.json]
+
+    if condition_arr.count(False) == 2:
         main(PAGE_URL)
-
+    else:
+        if args.thread:
+            async_main(PAGE_URL)
+        if args.json:
+            retrive_json(PAGE_URL , file_name)
+    
     if args.pdf:
         write_pdf(file_name)
-    
-    if args.json:
-        retrive_json(PAGE_URL , file_name)
     
 
 
