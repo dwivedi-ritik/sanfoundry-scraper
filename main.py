@@ -13,12 +13,13 @@ from bs4 import BeautifulSoup
 from pprint import pprint
 
 #added a little cli helper
-parser = ArgumentParser(description="A CLI Tool for scrapping quizs from SANFOUNDARY" , usage="\n python main.py --thread --workers 15", epilog="Batmobile lost the wheel lol")
+parser = ArgumentParser(description="A CLI Tool for scrapping quizs from SANFOUNDARY" , usage="Try python main.py --url quiz_url", epilog="Batmobile lost the wheel lol")
 parser.add_argument("--url" , help="URL of quiz" , type=str , default=None , dest="url")
 parser.add_argument("--pdf" , help="Generate PDF File" , default=False , dest="pdf" ,action="store_true")
 parser.add_argument("--thread" , action="store_true" , help="Uses Multithreading for scrapping")
 parser.add_argument("--json" , help="return all quizs in json format" , action ="store_true" , default=False , dest="json")
-parser.add_argument("--workers" , type=int , help="Maximum number of threads[ More number More speed but More Unstability]" , default=5)
+parser.add_argument("--workers" , type=int , help="Maximum number of threads[ More number More speed but More Unstability]" , default=5 , metavar='')
+parser.add_argument("--topic" , type=str , help="Filter only selected topic , pass in inverted commas" , default=None , dest="topic" ,metavar='')
 args = parser.parse_args()
 
 QUIZ_LIST: List[str] = []
@@ -28,7 +29,7 @@ def main(PAGE_URL: str ):
     if PAGE_URL == '':
         print("Please Enter a URL!")
         sys.exit(0)
-    pages = pagescrape(PAGE_URL)
+    pages = pagescrape(PAGE_URL , args.topic)
     
     if len(pages) == 0:
         MEGA_HTML += mcqscrape_html(PAGE_URL)
@@ -46,7 +47,7 @@ def writer(url: str) -> None:
     QUIZ_LIST.append(res)
 
 def async_main(url: str) -> None:
-    pages: List[str] = [ v for _ , v in pagescrape(url).items()]
+    pages: List[str] = [ v for _ , v in pagescrape(url , args.topic).items()]
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         #This will run writer function in multithread with each quiz url
         executor.map(writer , pages)
@@ -66,7 +67,6 @@ def retrive_json(link: str , file_name: str):
     pages = pagescrape(link)
     dump_json = {
         file_name:{
-
         }
     }
     print(len(pages))
@@ -80,14 +80,11 @@ def retrive_json(link: str , file_name: str):
     with open(file_name+".json", "w") as j:
         j.write(json.dumps(dump_json , indent=4))
 
-
 if __name__ == "__main__":
     command = "Enter the URL of the Page where you see links of all Subject related MCQs: "
     PAGE_URL = args.url or input(command)
     file_name = PAGE_URL.split('/')[-2]
     
-    #Well this is how supposed to solve weird if-else problem lol
-
     condition_arr = [args.thread , args.json]
 
     if condition_arr.count(False) == 2:
@@ -100,7 +97,7 @@ if __name__ == "__main__":
     
     if args.pdf:
         write_pdf(file_name)
-    
+
 
 
 """
