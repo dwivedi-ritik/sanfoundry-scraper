@@ -81,7 +81,7 @@ after that just run `python main.py` with required flags.
 
 ### Notes
 
-Wheasyprint require gtk libraries so if you running windows machine which does not have gtk libraries you may require to download (GTK for windows runtime envoironment) [https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases/tag/2021-04-29] libraries .
+Wheasyprint require gtk libraries so if you running windows machine which does not have gtk libraries you may require to download (GTK for windows runtime envoironment)[https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases/tag/2021-04-29] libraries .
 
 
 LOG: This is getting traction hehe so gonna make it better to use and better at output

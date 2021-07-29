@@ -1,10 +1,12 @@
 import os
 import requests
-from typing import List , Optional , Dict
-import bs4
+from typing import List, Optional, Dict
+
 from bs4 import BeautifulSoup
+from weasyprint import HTML, CSS
+
 from pagescrape import pagescrape
-from weasyprint import HTML , CSS
+
 
 def write_to_html(data: BeautifulSoup, filename):
     if not os.path.exists("Saved_MCQs"):
@@ -22,19 +24,19 @@ def write_to_html(data: BeautifulSoup, filename):
     </script>
     </head>""", "lxml")
     data.body.insert_before(head)
-    
+
     with open(f"./Saved_MCQs/{filename}.html", "w+", encoding="utf-8") as file:
         file.write(str(data.prettify()))
 
-#I used this function for markdownn and make pdf by that markdown
-#But somehow its takes huge amount time
+# This function does not work everytime
 
-def write_to_formated_html(pages: List[str] , file_name: str , write_pdf: Optional[bool] = False):
+
+def write_to_formated_html(pages: List[str], file_name: str, write_pdf: Optional[bool] = False):
     LORD_MD: str = ""
-    for module , link in pages.items():
+    for module, link in pages.items():
         temp = f"<h4><i>{module}<i></h4>\n"
-        for count , quiz in enumerate(mcqscrape_json(link)):
-            temp +=  f"<p>{count + 1}. {quiz['question']}</p>\n"
+        for count, quiz in enumerate(mcqscrape_json(link)):
+            temp += f"<p>{count + 1}. {quiz['question']}</p>\n"
             temp += "<ol type='a'>\n"
             for q in quiz["options"]:
                 temp += f"<li>{q}</li>\n"
@@ -42,31 +44,33 @@ def write_to_formated_html(pages: List[str] , file_name: str , write_pdf: Option
             temp += f"<p><b>Answer:</b> {quiz['answer']}</p>\n"
             temp += f"<p>{quiz['explanation']}</p>\n"
         LORD_MD += temp
-    
-    with open(f"./Saved_MCQs/{file_name}.html" , "w") as f:
+
+    with open(f"./Saved_MCQs/{file_name}.html", "w") as f:
         f.write(LORD_MD)
     inp = input("WeasyPrint is known to be slow and Converting html to pdf is resource taking and freezing can occur due to high ram use if pages are above 50 please close other apps. Are you sure ? (yes/no)")
     if write_pdf:
         if not os.path.exists("Saved_PDFs"):
             os.mkdir("Saved_PDFs")
         if inp.lower() != "no":
-            HTML(filename=f"./Saved_MCQs/{file_name}.html").write_pdf(f"./Saved_PDFs/{file_name}.pdf", stylesheets=[CSS(string='body { font-size: 13px }')])
+            HTML(filename=f"./Saved_MCQs/{file_name}.html").write_pdf(
+                f"./Saved_PDFs/{file_name}.pdf", stylesheets=[CSS(string='body { font-size: 13px }')])
 
-def mcqscrape_json(url) -> Dict[str , str]:
+
+def mcqscrape_json(url) -> Dict[str, str]:
     content: str = requests.get(url).content
-    soup = BeautifulSoup(content , "lxml")
-    q_content = soup.find("div" , "entry-content")
-    coll = q_content.find_all("div" , "collapseomatic_content")
+    soup = BeautifulSoup(content, "lxml")
+    q_content = soup.find("div", "entry-content")
+    coll = q_content.find_all("div", "collapseomatic_content")
     mcq_json: List = []
     for c in coll:
-        question , code , pre_code , answer ,  explain , options, = None , None , None , None , None , None
+        question, code, pre_code, answer,  explain, options, = None, None, None, None, None, None
         prevs = c.find_previous_siblings()
         res = prevs[0].text
         if res[0].isdigit():
             if prevs[0].span:
-                    prevs[0].span.decompose()
-                    temp_qna = res.split("\n")
-                    question , *options = temp_qna
+                prevs[0].span.decompose()
+                temp_qna = res.split("\n")
+                question, *options = temp_qna
         else:
             try:
                 if prevs[2]['class'][0] == "sf-mobile-ads":
@@ -81,17 +85,18 @@ def mcqscrape_json(url) -> Dict[str , str]:
             except KeyError as e:
                 pass
             options = prevs[0].text.split("\n")
-        answer , *temp_explain = c.text.split("\n")
+        answer, *temp_explain = c.text.split("\n")
         explain = "".join(temp_explain)
         mcq_json.append({
-            "question":question,
-            "pre_code":pre_code,
-            "code":code,
-            "options":options,
-            "answer":answer,
-            "explaination":explain
+            "question": question,
+            "pre_code": pre_code,
+            "code": code,
+            "options": options,
+            "answer": answer,
+            "explaination": explain
         })
     return mcq_json
+
 
 def mcqscrape_html(url: str) -> str:
     if '1000' in url:
@@ -135,5 +140,3 @@ def mcqscrape_html(url: str) -> str:
         print(str(content)[:100])
         return ''
     return content.prettify()
-
-
